@@ -92,6 +92,22 @@ jobs:
         EOF
 
 
+    - name: Change Postgres password on server
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'mypassword';"
+        EOF
+
+    - name: Apply migrations on server
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          cd ${{ secrets.DEPLOY_DIR }}
+          source venv/bin/activate
+          python manage.py migrate
+        EOF
+
+
+
     - name: Collect static files on server
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
