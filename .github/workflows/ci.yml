@@ -118,7 +118,6 @@ jobs:
 
           SERVICE_PATH="/etc/systemd/system/myapp.service"
 
-          # 1️⃣ Остановить и удалить старый сервис, если есть
           if systemctl list-units --type=service --all | grep -q myapp.service; then
             echo "Stopping old myapp.service..."
             sudo systemctl stop myapp.service || true
@@ -126,15 +125,12 @@ jobs:
             sudo rm -f $SERVICE_PATH
           fi
 
-          # 2️⃣ Создать unit-файл заново
           echo "Creating myapp.service..."
           sudo bash -c "cat > $SERVICE_PATH" << EOL
 
-          # 3️⃣ Перезагрузить systemd и включить сервис
           sudo systemctl daemon-reload
           sudo systemctl enable myapp.service
 
-          # 4️⃣ Запустить и проверить статус
           sudo systemctl start myapp.service
           sudo systemctl status myapp.service --no-pager
         EOF
