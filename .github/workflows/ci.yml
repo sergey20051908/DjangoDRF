@@ -91,13 +91,6 @@ jobs:
           pip install -r requirements.txt
         EOF
 
-    - name: Apply migrations on server
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cd ${{ secrets.DEPLOY_DIR }}
-          source venv/bin/activate
-          python manage.py migrate
-        EOF
 
     - name: Collect static files on server
       run: |
