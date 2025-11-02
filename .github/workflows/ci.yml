@@ -98,19 +98,6 @@ jobs:
           sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'mypassword';"
         EOF
 
-    - name: Update DATABASE_URL password on server
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          ENV_FILE="${{ secrets.DEPLOY_DIR }}/.env"
-          if [ -f "$ENV_FILE" ]; then
-            echo "Updating DATABASE_URL password..."
-            sed -i "s#postgres://postgres:.*@#postgres://postgres:mypassword@#" "$ENV_FILE"
-            echo "Updated .env:"
-            grep DATABASE_URL "$ENV_FILE"
-          else
-            echo "DATABASE_URL=postgres://postgres:mypassword@localhost:5432/mydb" > "$ENV_FILE"
-          fi
-        EOF
 
     - name: Apply migrations on server
       run: |
