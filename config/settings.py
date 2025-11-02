@@ -116,7 +116,7 @@ import dj_database_url
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv("DATABASE_URL", "postgres://postgres:mypassword@db:5432/mydb")
+        default=os.getenv("DATABASE_URL", "postgres://postgres:dima510141@db:5432/mydb")
     )
 }
 
