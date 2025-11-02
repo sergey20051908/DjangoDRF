@@ -91,43 +91,6 @@ jobs:
           pip install -r requirements.txt
         EOF
 
-
-    - name: Ensure Postgres user exists and has full privileges
-      run: |
-            ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << EOF
-            set -e
-
-            DB_USER="postgres"
-            DB_PASS="mypassword"
-
-            echo "🔍 Проверяем наличие пользователя \$DB_USER..."
-            USER_EXISTS=\$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='\$DB_USER';")
-
-            if [ "\$USER_EXISTS" = "1" ]; then
-                echo "✅ Пользователь \$DB_USER уже существует — обновляем пароль и права..."
-                sudo -u postgres psql -c "ALTER ROLE \$DB_USER WITH SUPERUSER CREATEDB CREATEROLE LOGIN PASSWORD '\$DB_PASS';"
-            else
-                echo "🆕 Пользователь \$DB_USER не найден — создаем нового с полными правами..."
-                sudo -u postgres psql -c "CREATE ROLE \$DB_USER WITH SUPERUSER CREATEDB CREATEROLE LOGIN PASSWORD '\$DB_PASS';"
-            fi
-
-            echo "🎯 Проверяем, что пользователь обновлен:"
-            sudo -u postgres psql -c "\\du \$DB_USER"
-            EOF
-
-
-    - name: Apply migrations on server
-      run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cd ${{ secrets.DEPLOY_DIR }}
-          export DATABASE_URL="postgres://postgres:mypassword@localhost:5432/mydb"
-          source venv/bin/activate
-          python manage.py migrate
-        EOF
-
-
-
-
     - name: Collect static files on server
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
